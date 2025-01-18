@@ -3,8 +3,9 @@ import dotenv from "dotenv";
 import session from "express-session";
 import passport from "passport";
 import connectDb from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js"
+import authRoutes from "./routes/authRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
+import urlRoutes from "./routes/urlRoutes.js";
 import "./config/passport.js";
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(passport.session());
 // Application routes
 app.use("/auth", authRoutes);
 app.use("/api", protectedRoutes);
+app.use("/api/shorten", urlRoutes);
 
 app.listen(port, () => {
   console.log(`Server starting at port ${port}`);
