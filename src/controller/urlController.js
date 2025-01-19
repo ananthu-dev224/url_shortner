@@ -1,6 +1,7 @@
 import ShortUrl from "../models/shortUrl.js";
 import { nanoid } from "nanoid";
 import axios from "axios";
+import {UAParser} from "ua-parser-js";
 
 export const createShortUrl = async (req, res) => {
   try {
@@ -61,14 +62,37 @@ export const redirectShortUrl = async (req, res) => {
     const userAgent = req.headers["user-agent"];
     const ipAddress = req.ip;
 
-    // Fetch geolocation data
-    const geoResponse = await axios.get(`https://ipapi.co/${ipAddress}/json/`);
+    // Parse user agent to extract OS and device information
+    const parser = new UAParser(userAgent);
+    const osName = parser.getOS().name || "Unknown";
+    const deviceType = parser.getDevice().type || "Desktop";
+
+    let geolocation = {};
+    try {
+      const geoResponse = await axios.get(
+        `https://ipapi.co/${ipAddress}/json/`
+      );
+      geolocation = {
+        country_name: geoResponse.data.country_name || "Unknown",
+        region: geoResponse.data.region || "Unknown",
+        city: geoResponse.data.city || "Unknown",
+      };
+    } catch (error) {
+      console.error("Failed to fetch geolocation data:", error.message);
+      geolocation = {
+        country_name: "Unknown",
+        region: "Unknown",
+        city: "Unknown",
+      };
+    }
 
     // Log analytics
     shortUrl.analytics.push({
       userAgent,
       ipAddress,
-      geolocation: geoResponse.data,
+      osName,
+      deviceType,
+      geolocation,
     });
 
     await shortUrl.save();

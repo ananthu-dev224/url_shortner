@@ -6,6 +6,7 @@ import connectDb from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import urlRoutes from "./routes/urlRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import "./config/passport.js";
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use(passport.session());
 app.use("/auth", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/shorten", urlRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.listen(port, () => {
   console.log(`Server starting at port ${port}`);
